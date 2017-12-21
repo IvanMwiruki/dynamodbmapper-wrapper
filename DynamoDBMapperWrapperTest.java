@@ -4,6 +4,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDeleteExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
@@ -27,8 +28,10 @@ public class DynamoDBMapperWrapperTest {
     private Object toSave;
     private Object key;
     private Object loaded;
+    private Object toDelete;
     private DynamoDBQueryExpression queryExpression;
     private DynamoDBScanExpression scanExpression;
+    private DynamoDBDeleteExpression deleteExpression;
     private PaginatedQueryList queryList;
     private PaginatedScanList scanList;
     private QueryResultPage queryResultPage;
@@ -44,8 +47,10 @@ public class DynamoDBMapperWrapperTest {
         toSave = new Object();
         key = new Object();
         loaded = new Object();
+        toDelete = new Object();
         queryExpression = new DynamoDBQueryExpression();
         scanExpression = new DynamoDBScanExpression();
+        deleteExpression = new DynamoDBDeleteExpression();
         queryList = mock(PaginatedQueryList.class);
         scanList = mock(PaginatedScanList.class);
         queryResultPage = new QueryResultPage();
@@ -237,5 +242,37 @@ public class DynamoDBMapperWrapperTest {
 
         verify(mapper).scanPage(Object.class, scanExpression, config);
         assertEquals(scanResultPage, result);
+    }
+
+    @Test
+    public void deleteObject() {
+        final Object result = mapperWrapper.delete(toDelete);
+
+        verify(mapper).delete(toDelete);
+        assertEquals(toDelete, result);
+    }
+
+    @Test
+    public void deleteObjectWithDeleteExpression() {
+        final Object result = mapperWrapper.delete(toDelete, deleteExpression);
+
+        verify(mapper).delete(toDelete, deleteExpression);
+        assertEquals(toDelete, result);
+    }
+
+    @Test
+    public void deleteObjectWithConfig() {
+        final Object result = mapperWrapper.delete(toDelete, config);
+
+        verify(mapper).delete(toDelete, config);
+        assertEquals(toDelete, result);
+    }
+
+    @Test
+    public void deleteObjectWithDeleteExpressionAndConfig() {
+        final Object result = mapperWrapper.delete(toDelete, deleteExpression, config);
+
+        verify(mapper).delete(toDelete, deleteExpression, config);
+        assertEquals(toDelete, result);
     }
 }

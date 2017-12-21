@@ -1,4 +1,5 @@
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDeleteExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
@@ -9,6 +10,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
 import com.amazonaws.services.dynamodbv2.datamodeling.QueryResultPage;
 import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
+import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
@@ -327,8 +329,76 @@ public class DynamoDBMapperWrapper {
      * @see IDynamoDBMapper#scanPage(Class, DynamoDBScanExpression, DynamoDBMapperConfig)
      */
     public <T> ScanResultPage<T> scanPage(Class<T> pojo,
-                                   DynamoDBScanExpression scanExpression,
-                                   DynamoDBMapperConfig config) {
+                                          DynamoDBScanExpression scanExpression,
+                                          DynamoDBMapperConfig config) {
         return mapper.scanPage(pojo, scanExpression, config);
+    }
+
+    /**
+     * Deletes a given item from DynamoDB. Additionally, it returns the item that was
+     * deleted. Under the hood, the DynamoDBMapper being delegated to uses
+     * {@link AmazonDynamoDB#deleteItem(DeleteItemRequest)}.
+     *
+     * @param pojo an object of a class corresponding to a DynamoDB table. To be deleted.
+     * @param <T>  the type of the objects being returned
+     * @return the item that was deleted
+     * @see IDynamoDBMapper#delete(Object, DynamoDBDeleteExpression, DynamoDBMapperConfig)
+     */
+    public <T> T delete(T pojo) {
+        mapper.delete(pojo);
+        return pojo;
+    }
+
+    /**
+     * Deletes a given item from DynamoDB. Additionally, it returns the item that was
+     * deleted. Under the hood, the DynamoDBMapper being delegated to uses
+     * {@link AmazonDynamoDB#deleteItem(DeleteItemRequest)}.
+     *
+     * @param pojo             an object of a class corresponding to a DynamoDB table. To be deleted.
+     * @param deleteExpression details on how to run the delete operation
+     * @param <T>              the type of the objects being returned
+     * @return the item that was deleted
+     * @see IDynamoDBMapper#delete(Object, DynamoDBDeleteExpression, DynamoDBMapperConfig)
+     */
+    public <T> T delete(T pojo, DynamoDBDeleteExpression deleteExpression) {
+        mapper.delete(pojo, deleteExpression);
+        return pojo;
+    }
+
+    /**
+     * Deletes a given item from DynamoDB. Additionally, it returns the item that was
+     * deleted. Under the hood, the DynamoDBMapper being delegated to uses
+     * {@link AmazonDynamoDB#deleteItem(DeleteItemRequest)}.
+     *
+     * @param pojo   an object of a class corresponding to a DynamoDB table. To be deleted.
+     * @param config is set to DEFAULT: {@link DynamoDBMapperConfig#DEFAULT} normally
+     *               but can be specified here.
+     * @param <T>    the type of the objects being returned
+     * @return the item that was deleted
+     * @see IDynamoDBMapper#delete(Object, DynamoDBDeleteExpression, DynamoDBMapperConfig)
+     */
+    public <T> T delete(T pojo, DynamoDBMapperConfig config) {
+        mapper.delete(pojo, config);
+        return pojo;
+    }
+
+    /**
+     * Deletes a given item from DynamoDB. Additionally, it returns the item that was
+     * deleted. Under the hood, the DynamoDBMapper being delegated to uses
+     * {@link AmazonDynamoDB#deleteItem(DeleteItemRequest)}.
+     *
+     * @param pojo             an object of a class corresponding to a DynamoDB table. To be deleted.
+     * @param deleteExpression details on how to run the delete operation
+     * @param config           is set to DEFAULT: {@link DynamoDBMapperConfig#DEFAULT} normally
+     *                         but can be specified here.
+     * @param <T>              the type of the objects being returned
+     * @return the item that was deleted
+     * @see IDynamoDBMapper#delete(Object, DynamoDBDeleteExpression, DynamoDBMapperConfig)
+     */
+    public <T> T delete(T pojo,
+                        DynamoDBDeleteExpression deleteExpression,
+                        DynamoDBMapperConfig config) {
+        mapper.delete(pojo, deleteExpression, config);
+        return pojo;
     }
 }
