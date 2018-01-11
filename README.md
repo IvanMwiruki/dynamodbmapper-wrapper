@@ -11,10 +11,8 @@ A simple wrapper around [DynamoDBMapper][1] that adds some enhancements.
 
 - Improved documentation, including: javadocs now state the actual low level operations being performed
     - Warning: as always, implementation details are subject to change. Though they're unlikely to in this case. Being aware of the implementation allows for optimizations and, at minimum, helps getting to the right javadocs easier. 
-    
-- Direct access to `updateItem(...)` from the [low level interface][2]
+
 
 - Other small tweaks
 
 [1]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/datamodeling/DynamoDBMapper.html
-[2]: http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.SDKs.Interfaces.LowLevel.html

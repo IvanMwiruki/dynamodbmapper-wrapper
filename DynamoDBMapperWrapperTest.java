@@ -1,9 +1,10 @@
+package dynamodb;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDeleteExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
@@ -15,7 +16,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
 import com.amazonaws.services.dynamodbv2.datamodeling.QueryResultPage;
 import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
-import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,49 +25,38 @@ import org.junit.Test;
 public class DynamoDBMapperWrapperTest {
 
     private DynamoDBMapper mapper;
-    private AmazonDynamoDB client;
     private DynamoDBMapperConfig config;
     private Object toSave;
     private Object key;
     private Object loaded;
     private Object toDelete;
-    private DynamoDBQueryExpression queryExpression;
+    private DynamoDBQueryExpression<Object> queryExpression;
     private DynamoDBScanExpression scanExpression;
     private DynamoDBDeleteExpression deleteExpression;
-    private PaginatedQueryList queryList;
-    private PaginatedScanList scanList;
-    private QueryResultPage queryResultPage;
-    private ScanResultPage scanResultPage;
+    private PaginatedQueryList<Object> queryList;
+    private PaginatedScanList<Object> scanList;
+    private QueryResultPage<Object> queryResultPage;
+    private ScanResultPage<Object> scanResultPage;
 
     private DynamoDBMapperWrapper mapperWrapper;
 
     @Before
     public void setUp() {
         mapper = mock(DynamoDBMapper.class);
-        client = mock(AmazonDynamoDB.class);
         config = DynamoDBMapperConfig.DEFAULT;
         toSave = new Object();
         key = new Object();
         loaded = new Object();
         toDelete = new Object();
-        queryExpression = new DynamoDBQueryExpression();
+        queryExpression = new DynamoDBQueryExpression<>();
         scanExpression = new DynamoDBScanExpression();
         deleteExpression = new DynamoDBDeleteExpression();
         queryList = mock(PaginatedQueryList.class);
         scanList = mock(PaginatedScanList.class);
-        queryResultPage = new QueryResultPage();
-        scanResultPage = new ScanResultPage();
+        queryResultPage = new QueryResultPage<>();
+        scanResultPage = new ScanResultPage<>();
 
-        mapperWrapper = new DynamoDBMapperWrapper(mapper, client);
-    }
-
-    @Test
-    public void update() {
-        final UpdateItemRequest request = mock(UpdateItemRequest.class);
-
-        mapperWrapper.update(request);
-
-        verify(client).updateItem(request);
+        mapperWrapper = new DynamoDBMapperWrapper(mapper);
     }
 
     @Test
@@ -274,5 +265,15 @@ public class DynamoDBMapperWrapperTest {
 
         verify(mapper).delete(toDelete, deleteExpression, config);
         assertEquals(toDelete, result);
+    }
+
+    @Test
+    public void batchWrite() {
+        final List<Object> write = Arrays.asList(new Object(), new Object(), new Object());
+        final List<Object> delete = Arrays.asList(new Object(), new Object(), new Object());
+
+        mapperWrapper.batchWrite(write, delete);
+
+        verify(mapper).batchWrite(write, delete);
     }
 }

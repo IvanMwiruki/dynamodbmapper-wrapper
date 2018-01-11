@@ -1,3 +1,5 @@
+package dynamodb;
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDeleteExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -10,13 +12,14 @@ import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
 import com.amazonaws.services.dynamodbv2.datamodeling.QueryResultPage;
 import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
+import com.amazonaws.services.dynamodbv2.model.BatchWriteItemRequest;
 import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
-import com.amazonaws.services.dynamodbv2.model.UpdateItemResult;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,23 +28,9 @@ import java.util.Optional;
 public class DynamoDBMapperWrapper {
 
     private final DynamoDBMapper mapper;
-    private final AmazonDynamoDB client;
 
-    public DynamoDBMapperWrapper(DynamoDBMapper mapper, AmazonDynamoDB client) {
+    public DynamoDBMapperWrapper(DynamoDBMapper mapper) {
         this.mapper = mapper;
-        this.client = client;
-    }
-
-    /**
-     * Edits an existing item's attributes, or adds a new item to the table if it does not already exist.
-     * Same behavior can be replicated using save(...) with a {@link DynamoDBMapperConfig}.
-     *
-     * @param updateItemRequest the input to an UpdateItem operation
-     * @return UpdateItemResult
-     * @see AmazonDynamoDB#updateItem(UpdateItemRequest)
-     */
-    public UpdateItemResult update(UpdateItemRequest updateItemRequest) {
-        return client.updateItem(updateItemRequest);
     }
 
     /**
@@ -400,5 +389,21 @@ public class DynamoDBMapperWrapper {
                         DynamoDBMapperConfig config) {
         mapper.delete(pojo, deleteExpression, config);
         return pojo;
+    }
+
+    /**
+     * Saves and deletes the objects given using one or more calls to the
+     * {@link AmazonDynamoDB#batchWriteItem(BatchWriteItemRequest)} API.
+     * Cannot have more than 25 requests in the batch.
+     *
+     * @param objectsToWrite  a list of objects to save to DynamoDB.
+     * @param objectsToDelete a list of objects to delete from DynamoDB.
+     * @return a list of failed batches which includes the unprocessed items and the exceptions
+     *     causing the failure.
+     * @see AmazonDynamoDB#batchWriteItem(BatchWriteItemRequest)
+     */
+    public List<DynamoDBMapper.FailedBatch> batchWrite(Iterable<?> objectsToWrite,
+                                                       Iterable<?> objectsToDelete) {
+        return mapper.batchWrite(objectsToWrite, objectsToDelete);
     }
 }
